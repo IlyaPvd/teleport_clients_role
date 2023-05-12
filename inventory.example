@@ -1,0 +1,10 @@
+[teleport-clients]
+node1 ansible_host=192.168.100.1
+node2 ansible_host=192.168.100.2
+node3 ansible_host=192.168.100.3
+node4 ansible_host=192.168.100.4
+node5 ansible_host=192.168.100.5
+node6 ansible_host=192.168.100.6
+
+[teleport-server]
+server-teleport ansible_host=192.168.100.10

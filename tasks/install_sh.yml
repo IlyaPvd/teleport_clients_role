@@ -1,0 +1,9 @@
+---
+
+- name: run install script
+  when: "'teleport-clients' in group_names"
+  become: true
+  become_method: sudo
+  shell: bash -c "$(curl -fsSL https://{{ teleport_server }}/scripts/$(cat /tmp/teleport_token_{{ inventory_hostname }}.txt)/install-node.sh)"
+
+

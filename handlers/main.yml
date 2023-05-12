@@ -1,0 +1,7 @@
+---
+# handlers file for teleport_clients
+- name: Restart teleport
+  become: yes
+  service:
+    name: teleport
+    state: restarted

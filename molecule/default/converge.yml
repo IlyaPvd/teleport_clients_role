@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include teleport.teleport_clients"
+      ansible.builtin.include_role:
+        name: "teleport.teleport_clients"

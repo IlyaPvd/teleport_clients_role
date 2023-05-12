@@ -1,0 +1,10 @@
+---
+- name: install pkg
+  when: "'teleport-clients' in group_names"
+  apt:
+    name:
+      - curl
+      - tar
+      - jq
+    state: present
+  become: true

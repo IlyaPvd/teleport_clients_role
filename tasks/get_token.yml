@@ -1,0 +1,81 @@
+---
+
+- name: Get client names from inventory
+#   hosts: teleport_server
+  when: "'teleport-server' in group_names"
+  set_fact:
+    client_names: "{{ groups['teleport-clients'] }}"
+    
+- name: Получение уникального токена для клиента
+  when: "'teleport-server' in group_names"
+  command: "tctl tokens add --type=node --ttl=5m --format text"
+  register: teleport_token_output
+  loop: "{{ groups['teleport-clients'] }}"
+  loop_control:
+    loop_var: client_index
+
+
+- name: Создание файла с токеном на клиентском сервере
+  when: "'teleport-server' in group_names"
+  ansible.builtin.copy:
+    content: "{{ teleport_token_output.results[client_index].stdout }}"
+    dest: "/tmp/teleport_token_{{ item }}.txt"
+    owner: root
+    group: root
+    mode: "0600"
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['teleport-clients'] }}"
+  loop_control:
+    index_var: client_index
+
+- name: Add new host to hosts file
+  when: "'teleport-clients' in group_names"
+  lineinfile:
+    path: /etc/hosts
+    line: '{{ teleport_server_ip }} {{ teleport_server_name }}'
+    state: present
+
+
+
+
+
+# - name: Рассылка уникального токена на клиентский сервер
+#   when: "'teleport-server' in group_names"
+#   set_fact:
+#     teleport_token: "{{ teleport_token_output.results[client_index].stdout }}"
+#   delegate_to: "{{ item }}"
+#   loop: "{{ groups['teleport-clients'] }}"
+#   loop_control:
+#     index_var: client_index
+
+
+
+
+
+
+
+- name: run install script
+  when: "'teleport-clients' in group_names"
+  become: true
+  become_method: sudo
+  shell: bash -c "$(curl -fsSL https://{{ teleport_server }}/scripts/$(cat /tmp/teleport_token_{{ inventory_hostname }}.txt)/install-node.sh)"
+#  shell: cat /tmp/teleport_token_{{ inventory_hostname }}.txt
+
+
+# - name: Generate tokens for Teleport nodes
+# #   hosts: teleport_server
+#   when: "'teleport-server' in group_names"
+#   command: tctl tokens add --labels srv="{{ item }}" --type=node --format text
+#   with_items: "{{ client_names }}"
+#   register: token_output
+
+# - name: Set token variable for each client
+#   set_fact:
+#     teleport_tokens: "{{ teleport_tokens|default({})|combine({ item.item: item.stdout }) }}"
+#   with_items: "{{ token_output.results }}"
+
+# - name: Print generated tokens for each client
+#   debug:
+#     var: teleport_tokens
+
+

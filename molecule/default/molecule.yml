@@ -1,0 +1,14 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+platforms:
+  - name: instance
+    box: ubuntu/focal64
+    packages:
+      - python3-pip
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
