@@ -25,6 +25,8 @@ Role Variables
 
 ```text
 teleport_server: 'example.com:8080'
+teleport_server_ip: '192.168.100.10'
+teleport_server_name: 'example.com'
 ```
 
 Dependencies
